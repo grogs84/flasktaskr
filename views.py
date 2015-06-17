@@ -7,6 +7,8 @@ from functools import wraps
 from flask import Flask, flash, redirect, render_template, \
 	request, session, url_for, g
 
+from forms import AddTaskForm
+
 
 # config
 
@@ -23,7 +25,7 @@ def connect_db():
 def login_required(test):
 	@wraps(test)
 	def wrap(*args, **kwargs):
-		if 'loggd_in' in session:
+		if 'logged_in' in session:
 			return test(*args, **kwargs)
 		else:
 			flash("You need to login first")
@@ -43,8 +45,7 @@ def logout():
 @app.route('/', methods=['GET', 'POST'])
 def login():
 	if request.method == 'POST':
-		if request.form['username'] != app.config['USERNAME']\
-				or request.form['password'] != app.config['PASSWORD']:
+		if request.form['username'] != app.config['USERNAME'] or request.form['password'] != app.config['PASSWORD']:
 			error = 'Invalid Credentidals. Please try again.'
 			return render_template('login.html', error=error)
 		else:
@@ -59,7 +60,7 @@ def login():
 def tasks():
 	g.db = connect_db()
 	cur = g.db.execute(
-		'select name, due_date, priority, task_id, from tasks where status-1'
+		'select name, due_date, priority, task_id from tasks where status=1'
 		)
 
 	open_tasks = [
@@ -67,7 +68,7 @@ def tasks():
 	]
 
 	cur = g.db.execute(
-	'select name, due_date, priority, task_id, from tasks where status=0'
+	'select name, due_date, priority, task_id from tasks where status=0'
 	)
 
 	closed_tasks = [
@@ -96,7 +97,7 @@ def new_task():
 		return redirect(url_for('tasks'))
 	else:
 		g.db.execute('insert into tasks (name, due_date, priority, status)\
-			values(?,?,?,?)', [
+			values(?,?,?)', [
 				request.form['name'],
 				request.form['due_date'],
 				request.form['priority']
