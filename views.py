@@ -21,7 +21,21 @@ from models import Task, User
 
 # helper functions
 
-@app.route('/register/', methods['GET', 'POST'])
+
+
+def login_required(test):
+	@wraps(test)
+	def wrap(*args, **kwargs):
+		if 'logged_in' in session:
+			return test(*args, **kwargs)
+		else:
+			flash("You need to login first")
+			return redirect(url_for('login'))
+	return wrap
+
+
+# route handlers
+@app.route('/register/', methods=['GET', 'POST'])
 def register():
 	error = None
 	form = RegisterForm(request.form)
@@ -37,20 +51,6 @@ def register():
 			flash('Thanks for registering. Please login.')
 			return redirect(url_for('login'))
 	return render_template('register.html', form=form, error=error)
-			
-
-def login_required(test):
-	@wraps(test)
-	def wrap(*args, **kwargs):
-		if 'logged_in' in session:
-			return test(*args, **kwargs)
-		else:
-			flash("You need to login first")
-			return redirect(url_for('login'))
-	return wrap
-
-
-# route handlers
 
 @app.route('/logout/')
 def logout():
