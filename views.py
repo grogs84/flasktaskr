@@ -10,6 +10,8 @@ from flask import Flask, flash, redirect, render_template, \
 from forms import AddTaskForm, RegisterForm, LoginForm
 from flask.ext.sqlalchemy import SQLAlchemy
 
+import datetime
+
 
 # config
 
@@ -98,14 +100,16 @@ def tasks():
 @app.route('/add/', methods=['POST'])
 @login_required
 def new_task():
-	form = AddTaskForm(request.Form)
+	form = AddTaskForm(request.form)
 	if request.method == 'POST':
 		if form.validate_on_submit():
 			new_task = Task(
 				form.name.data,
 				form.due_date.data,
 				form.priority.data,
-				'1'
+				datetime.datetime.utcnow(),
+				'1',
+				'1',
 			)
 			db.session.add(new_task)
 			db.session.commit()
