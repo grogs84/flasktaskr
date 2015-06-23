@@ -23,6 +23,20 @@ from models import Task, User
 
 # helper functions
 
+def open_tasks():
+	return db.session.query(Task).filter_by(
+		status='1').order_by(Task.due_date.asc())
+
+def closed_tasks():
+	return db.session.query(Task).filter_by(
+		status='0').order_by(Task.due_date.asc())
+		
+
+def flash_errors(form):
+	for field, errors in form.errors.items():
+		for error in errors:
+			flash(u"Error in the %s field - %s" % (
+				getattr(form, field).label.text, error), 'error')
 
 
 def login_required(test):
@@ -57,6 +71,7 @@ def register():
 @app.route('/logout/')
 def logout():
 	session.pop('logged_in', None)
+	session.pop('user_id', None)
 	flash("Goodbye!")
 	return redirect(url_for('login'))
 
@@ -70,6 +85,7 @@ def login():
 			user = User.query.filter_by(name=request.form['name']).first()
 			if user is not None and user.password == request.form['password']:
 				session['logged_in'] = True
+				session['user_id'] = user.id
 				flash("Welcome")
 				return redirect(url_for('tasks'))
 			else:
@@ -83,23 +99,18 @@ def login():
 @app.route('/tasks/')
 @login_required
 def tasks():
-	open_tasks = db.session.query(Task)\
-	.filter_by(status='1').order_by(Task.due_date.asc())
-
-	closed_tasks = db.session.query(Task)\
-	.filter_by(status='0').order_by(Task.due_date.asc())
-
 	return render_template(
 		'tasks.html',
 		form=AddTaskForm(request.form),
-		open_tasks=open_tasks,
-		closed_tasks=closed_tasks
+		open_tasks=open_tasks(),
+		closed_tasks=closed_tasks()
 	)
 
 # add new tasks
 @app.route('/add/', methods=['POST'])
 @login_required
 def new_task():
+	error = None
 	form = AddTaskForm(request.form)
 	if request.method == 'POST':
 		if form.validate_on_submit():
@@ -109,12 +120,27 @@ def new_task():
 				form.priority.data,
 				datetime.datetime.utcnow(),
 				'1',
-				'1',
+				session['user_id'],
 			)
 			db.session.add(new_task)
 			db.session.commit()
 			flash('New entry was successfully posted. Thanks')
-	return redirect(url_for('tasks'))
+			return redirect(url_for('tasks'))
+		else:
+			return render_template('tasks.html', 
+							form=form, 
+							error=error,
+							open_tasks=open_tasks(),
+							closed_tasks=closed_tasks()
+			)
+
+	return render_template('tasks.html', 
+							form=form, 
+							error=error,
+							open_tasks=open_tasks(),
+							closed_tasks=closed_tasks() 
+	)
+
 
 
 # mark tasks as complete
