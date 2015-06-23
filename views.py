@@ -116,6 +116,7 @@ def new_task():
 			flash('New entry was successfully posted. Thanks')
 	return redirect(url_for('tasks'))
 
+
 # mark tasks as complete
 @app.route('/complete/<int:task_id>/')
 @login_required
