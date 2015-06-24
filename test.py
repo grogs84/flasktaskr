@@ -30,6 +30,9 @@ class AllTests(unittest.TestCase):
 		return self.app.post('/', data=dict(
 			name=name, password=password), follow_redirects=True)
 
+	def logout(self):
+		return self.app.get('logout/', follow_redirects=True)
+
 	def register(self, name, email, password, confirm):
 		return self.app.post(
 			'register/',
@@ -70,7 +73,31 @@ class AllTests(unittest.TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertIn(b'Please register to access the task list', response.data)
 
+	def test_user_registration(self):
+		self.app.get('register/', follow_redirects=True)
+		response = self.register(
+			'Michael', 'michael@realpython.com', 'python', 'python'
+			)
+		self.assertIn(b'Thanks for registering. Please login.', response.data)
 
+	def test_user_registeration_error(self):
+		self.app.get('register/', follow_redirects=True)
+		self.register('Michael', 'michael@realpython.com', 'python', 'python')
+		self.app.get('register/', follow_redirects=True)
+		response = self.register('Michael', 'michael@realpython.com', 'python', 'python')
+		self.assertIn(b'That username and/or email already exists.', response.data)
+
+	def test_logged_in_users_can_logout(self):
+		self.register('Fletcher', 'fletcher@realpython.com', 'python101', 'python101')
+		self.login('Fletcher', 'python101')
+		response = self.logout()
+		self.assertIn(b'Goodbye!', response.data)
+
+	def test_not_logged_in_users_cannot_logout(self):
+		response = self.logout()
+		self.assertNotIn(b'Goodbye!', response.data)
+
+	
 
 
 
