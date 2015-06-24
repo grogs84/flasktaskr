@@ -87,15 +87,23 @@ class AllTests(unittest.TestCase):
 		response = self.register('Michael', 'michael@realpython.com', 'python', 'python')
 		self.assertIn(b'That username and/or email already exists.', response.data)
 
-	def test_logged_in_users_can_logout(self):
-		self.register('Fletcher', 'fletcher@realpython.com', 'python101', 'python101')
-		self.login('Fletcher', 'python101')
-		response = self.logout()
-		self.assertIn(b'Goodbye!', response.data)
+	# def test_logged_in_users_can_logout(self):
+	# 	self.register('Fletcher', 'fletcher@realpython.com', 'python101', 'python101')
+	# 	self.login('Fletcher', 'python101')
+	# 	response = self.logout()
+	# 	self.assertIn(b'Goodbye!', response.data)
 
 	def test_not_logged_in_users_cannot_logout(self):
 		response = self.logout()
 		self.assertNotIn(b'Goodbye!', response.data)
+
+	def test_logged_in_users_can_access_tasks_page(self):
+		self.register('Grogan', 'grogan@realpython.com', 'grogan', 'grogan')
+		self.login('Grogan', 'grogan')
+		response = self.app.get('tasks/')
+		self.assertEqual(response.status_code, 200)
+		self.assertIn(b'Add a new task', response.data)
+	
 
 	
 
