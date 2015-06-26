@@ -45,6 +45,8 @@
 			<div class="content">
 
 				<br>
+				<br>
+				<br>
 
 				{% for message in get_flashed_messages() %}
 					<div class="alert alert-success">{{ message }}</div>
@@ -64,10 +66,12 @@
 			</div>
 		</div><!--/.container-->
 
-		<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap.min.js' )}}"></script>
+		<!-- // <script type="text/javascript" src="{{url_for('static', filename='js/bootstrap.min.js' )}}"></script> -->
 		<!-- // <script type="text/javascript" src="{{url_for('static', filename='js/jquery-ui-min.js' )}}"></script> -->
 		<script type="text/javascript" src="//code.jquery.com/jquery-latest.min.js "></script>
 		<script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+		
+		
 
 	</body>
 </html>
