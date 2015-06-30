@@ -80,28 +80,28 @@ class UsersTests(unittest.TestCase):
 
     def test_users_cannot_login_unless_registered(self):
         response = self.login('foo', 'bar')
-        self.assertIn(b'Invalid username or password.', response.data)
+        self.assertIn(b'Invalid username or password', response.data)
 
     def test_users_can_login(self):
         self.register('Michael', 'michael@realpython.com', 'python', 'python')
         response = self.login('Michael', 'python')
-        self.assertIn(b'Welcome!', response.data)
+        self.assertIn(b'Welcome', response.data)
 
     def test_invalid_form_data(self):
         self.register('Michael', 'michael@realpython.com', 'python', 'python')
         response = self.login('alert("alert box!");', 'foo')
-        self.assertIn(b'Invalid username or password.', response.data)
+        self.assertIn(b'Invalid username or password', response.data)
 
     def test_form_is_present_on_register_page(self):
         response = self.app.get('register/')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Please register to access the task list.', response.data)
+        self.assertIn(b'Please register to access the task list', response.data)
 
     def test_user_registeration(self):
         self.app.get('register/', follow_redirects=True)
         response = self.register(
             'Michael', 'michael@realpython.com', 'python', 'python')
-        self.assertIn(b'Thanks for registering. Please login.', response.data)
+        self.assertIn(b'Thanks for registering. Please login', response.data)
 
     def test_user_registeration_error(self):
         self.app.get('register/', follow_redirects=True)
@@ -111,7 +111,7 @@ class UsersTests(unittest.TestCase):
             'Michael', 'michael@realpython.com', 'python', 'python'
         )
         self.assertIn(
-            b'That username and/or email already exist.',
+            b'That username and/or email already exist',
             response.data
         )
 
@@ -129,7 +129,7 @@ class UsersTests(unittest.TestCase):
         self.register('Fletcher', 'fletcher@realpython.com', 'python101', 'python101')
         response = self.register('Fletcher', 'fletcher@realpython.com', 'python101', 'python101')
         self.assertIn(
-            b'That username and/or email already exist.',
+            b'That username and/or email already exist',
             response.data
         )
 
