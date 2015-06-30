@@ -1,4 +1,4 @@
-# project/test.py
+# project/test_users.py
 
 
 import os
@@ -11,7 +11,7 @@ from models import User
 TEST_DB = 'test.db'
 
 
-class AllTests(unittest.TestCase):
+class UsersTests(unittest.TestCase):
 
     ############################
     #### setup and teardown ####
@@ -36,19 +36,33 @@ class AllTests(unittest.TestCase):
     #### helper methods ####
     ########################
 
-    def login(self, username, password):
-        self.app.post("/", data=dict(username=username, password=password), follow_redirects=True)
+    def login(self, name, password):
+        return self.app.post('/', data=dict(
+            name=name, password=password), follow_redirects=True)
 
-    def register(self, username, email, password):
+    def register(self, name, email, password, confirm):
         return self.app.post(
-        'register/',
-        data=dict(name=name, email=email, password=password, confirm=confirm),
-        follow_redirects=True)
+            'register/',
+            data=dict(name=name, email=email, password=password, confirm=confirm),
+            follow_redirects=True
+        )
 
+    def logout(self):
+        return self.app.get('logout/', follow_redirects=True)
 
-    ########################
-    #### Tests #############
-    ########################
+    def create_user(self, name, email, password):
+        new_user = User(name=name, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+
+    def create_task(self):
+        return self.app.post('add/', data=dict(
+            name='Go to the bank',
+            due_date='02/05/2015',
+            priority='1',
+            posted_date='02/04/2015',
+            status='1'
+        ), follow_redirects=True)
 
     def test_users_can_register(self):
         new_user = User("michael", "michael@mherman.org", "michaelherman")
@@ -66,30 +80,30 @@ class AllTests(unittest.TestCase):
 
     def test_users_cannot_login_unless_registered(self):
         response = self.login('foo', 'bar')
-        self.assertIn(b'Invalid username or password', response.data)
+        self.assertIn(b'Invalid username or password.', response.data)
 
     def test_users_can_login(self):
         self.register('Michael', 'michael@realpython.com', 'python', 'python')
         response = self.login('Michael', 'python')
-        self.assertIn(b'Welcome', response.data)
+        self.assertIn(b'Welcome!', response.data)
 
     def test_invalid_form_data(self):
         self.register('Michael', 'michael@realpython.com', 'python', 'python')
         response = self.login('alert("alert box!");', 'foo')
-        self.assertIn(b'Invalid username or password', response.data)
+        self.assertIn(b'Invalid username or password.', response.data)
 
     def test_form_is_present_on_register_page(self):
         response = self.app.get('register/')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Please register to access the task list', response.data)
+        self.assertIn(b'Please register to access the task list.', response.data)
 
-    def test_user_registration(self):
+    def test_user_registeration(self):
         self.app.get('register/', follow_redirects=True)
         response = self.register(
             'Michael', 'michael@realpython.com', 'python', 'python')
         self.assertIn(b'Thanks for registering. Please login.', response.data)
 
-    def test_user_registration_error(self):
+    def test_user_registeration_error(self):
         self.app.get('register/', follow_redirects=True)
         self.register('Michael', 'michael@realpython.com', 'python', 'python')
         self.app.get('register/', follow_redirects=True)
@@ -97,7 +111,7 @@ class AllTests(unittest.TestCase):
             'Michael', 'michael@realpython.com', 'python', 'python'
         )
         self.assertIn(
-            b'That username and/or email already exist',
+            b'That username and/or email already exist.',
             response.data
         )
 
@@ -111,5 +125,13 @@ class AllTests(unittest.TestCase):
         response = self.logout()
         self.assertNotIn(b'Goodbye!', response.data)
 
-    if __name__ == "__main__":
-        unittest.main()
+    def test_duplicate_user_registeration_throws_error(self):
+        self.register('Fletcher', 'fletcher@realpython.com', 'python101', 'python101')
+        response = self.register('Fletcher', 'fletcher@realpython.com', 'python101', 'python101')
+        self.assertIn(
+            b'That username and/or email already exist.',
+            response.data
+        )
+
+if __name__ == "__main__":
+    unittest.main()

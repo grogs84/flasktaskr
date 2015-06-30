@@ -10,7 +10,6 @@ from models import User
 
 TEST_DB = 'test.db'
 
-
 class AllTests(unittest.TestCase):
 
     ############################
