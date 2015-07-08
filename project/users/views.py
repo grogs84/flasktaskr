@@ -64,4 +64,25 @@ def login():
 			else:
 				error = 'Invalid username or password.'
 	return render_template('login.html', form=form, error=error)
-	
+
+@users_blueprint.route('/register/', methods=['GET', 'POST'])
+def register():
+	error  = None
+	form = RegisterForm(request.form)
+	if request.method =='POST'
+		if request.validate_on_submit():
+			new_user = User(
+				form.name.data,
+				form.email.data,
+				form.password.data
+			)
+			try:
+				db.session.add(new_user)
+				db.session.commit()
+				flash('Thanks for registering. Please login')
+				return redirect(url_for('users.login'))
+			except IntegrityError:
+				error = 'That username and/or email already exists.'
+				return render_template('register.html', form=form, error=error)
+	return render_template('register.html', form=form, error=error)
+
