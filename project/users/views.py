@@ -13,7 +13,7 @@ from sqlalchemy.exc import IntegrityError
 
 from .forms import RegisterForm, LoginForm
 from project import db
-from project.models import users
+from project.models import User
 
 ########################
 ## config ##############
@@ -69,8 +69,8 @@ def login():
 def register():
 	error  = None
 	form = RegisterForm(request.form)
-	if request.method =='POST'
-		if request.validate_on_submit():
+	if request.method =='POST':
+		if form.validate_on_submit():
 			new_user = User(
 				form.name.data,
 				form.email.data,

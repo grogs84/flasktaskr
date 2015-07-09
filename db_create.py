@@ -1,9 +1,9 @@
 # project/db_create.py
-
-
-from views import db
-from models import Task
 from datetime import date
+
+from project import db
+from project.models import Task, User
+
 
 db.create_all()
 

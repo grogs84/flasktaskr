@@ -30,11 +30,11 @@ def login_required(test):
 	return wrap
 
 def open_tasks():
-	return db.session.query(Tasks).filter_by(
-		status='1').order_by(Tasks.due_date.asc())
+	return db.session.query(Task).filter_by(
+		status='1').order_by(Task.due_date.asc())
 
 def closed_tasks():
-	return db.session.query(Tasks).filter_by(
+	return db.session.query(Task).filter_by(
 		status='0').order_by(Task.due_date.asc())
 
 ################################
@@ -69,7 +69,7 @@ def new_task():
 			db.session.add(new_task)
 			db.session.commit()
 			flash('New entry was successfully posted. Thanks')
-			return redirect(url_for('tasks.html'))
+			return redirect(url_for('tasks.tasks'))
 	return render_template(
 		'tasks.html',
 		form=form,
@@ -106,4 +106,3 @@ def delete_entry(task_id):
 		flash('You can only complete tasks that belong to you.')
 		return redirect(url_for('tasks.tasks'))
 
-		
