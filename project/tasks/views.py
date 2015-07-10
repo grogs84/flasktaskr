@@ -48,7 +48,8 @@ def tasks():
 		'tasks.html',
 		form=AddTaskForm(request.form),
 		open_tasks=open_tasks(),
-		closed_tasks=closed_tasks()
+		closed_tasks=closed_tasks(),
+		username=session['name']
 	)
 
 @tasks_blueprint.route('/add/', methods=['GET', 'POST'])
@@ -68,14 +69,14 @@ def new_task():
 			)
 			db.session.add(new_task)
 			db.session.commit()
-			flash('New entry was successfully posted. Thanks')
+			flash('New entry was successfully posted. Thanks.')
 			return redirect(url_for('tasks.tasks'))
 	return render_template(
 		'tasks.html',
 		form=form,
 		error=error,
 		open_tasks=open_tasks(),
-		closed_tasks=closed_tasks()
+		closed_tasks=closed_tasks(),
 	)
 
 @tasks_blueprint.route('/complete/<int:task_id>/')
@@ -92,7 +93,7 @@ def complete(task_id):
 		flash('You can only update tasks that belong to you.')
 		return redirect(url_for('tasks.tasks'))
 
-@tasks_blueprint.route('/delete/<int:task_id>')
+@tasks_blueprint.route('/delete/<int:task_id>/')
 @login_required
 def delete_entry(task_id):
 	new_id = task_id
@@ -103,6 +104,6 @@ def delete_entry(task_id):
 		flash('The task was deleted. Why not add a new one?')
 		return redirect(url_for('tasks.tasks'))
 	else:
-		flash('You can only complete tasks that belong to you.')
+		flash('You can only delete tasks that belong to you.')
 		return redirect(url_for('tasks.tasks'))
 
