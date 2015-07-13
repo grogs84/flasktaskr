@@ -1,7 +1,7 @@
 # project/db_create.py
 from datetime import date
 
-from project import db
+from project import db, bcrypt
 from project.models import Task, User
 
 
