@@ -41,8 +41,8 @@ class TasksTests(unittest.TestCase):
         return self.app.post('/', data=dict(
             name=name, password=password), follow_redirects=True)
 
-    def register(self, name=maggieg, email=maggieg@email.com, password=maggieg, confirm=maggieg):
-        return self.app.post(
+    def register(self, name='maggieg', email='maggieg@email.com', password='maggieg', confirm='maggieg'):
+            return self.app.post(
             'register/',
             data=dict(name=name, email=email, password=password, confirm=confirm),
             follow_redirects=True
@@ -219,6 +219,21 @@ class TasksTests(unittest.TestCase):
         self.login('Fletcher', 'python101')
         self.app.get('tasks/', follow_redirects=True)
         response = self.create_task()
+        self.assertIn(b'complete/2/', response.data)
+        self.assertIn(b'delete/2/', response.data)
+
+    def test_admin_users_can_see_task_modify_links_for_all_tasks(self):
+        self.register()
+        self.login('maggieg', 'maggieg')
+        self.app.get('tasks/', follow_redirects=True)
+        self.create_task()
+        self.logout()
+        self.create_admin_user()
+        self.login('Superman', 'allpowerful')
+        self.app.get('tasks/', follow_redirects=True)
+        response = self.create_task()
+        self.assertIn(b'complete/1/', response.data)
+        self.assertIn(b'delete/1/', response.data)
         self.assertIn(b'complete/2/', response.data)
         self.assertIn(b'delete/2/', response.data)
         
