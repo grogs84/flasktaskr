@@ -17,7 +17,7 @@ def commit():
 
 
 def push():
-    local("git push master origin")
+    local("git push origin master")
 
 
 def prepare():
@@ -29,7 +29,7 @@ def prepare():
 # deploy
 
 def pull():
-    local("git pull origin master")
+    local("git pull master origin")
 
 
 def heroku():
