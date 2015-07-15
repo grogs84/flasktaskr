@@ -17,7 +17,7 @@ def commit():
 
 
 def push():
-    local("git push origin master")
+    local("git push master origin")
 
 
 def prepare():
