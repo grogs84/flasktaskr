@@ -7,7 +7,7 @@ DATABASE = 'flasktaskr.db'
 CSRF_ENABLED = True
 WTF_CSRF_ENABLED = True
 SECRET_KEY = 'my_precious'
-DEBUG = False
+DEBUG = True
 
 # define the full path for the DATABASE
 DATABASE_PATH = os.path.join(basedir, DATABASE)
